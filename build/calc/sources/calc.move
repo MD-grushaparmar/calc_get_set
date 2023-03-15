@@ -1,100 +1,51 @@
 module calc::calc{
-    use std::signer;
+    //use std::signer;
    // use std::string;
-    use std::error;
+    // use std::error;
     // use aptos_framework::account;
     // use aptos_framework::event;
 
-    struct Sum has key,drop{
-        value : u64,
-    }
-    struct Sub has key,drop{
-        value: u64,
-    }
-    struct Multi has key,drop{
-        value: u64,
-    }
-    struct Div has key, drop{
-        value: u64,
-    }
     const ENO_MESSAGE:u64= 0;
+    const EARITHMATIC_ERROR:u64 = 1;
 
     #[view]
-    public fun get_addition(account: address): u64 acquires Sum{
-        assert!(exists<Sum>(account),error::not_found(ENO_MESSAGE));
-        *&borrow_global<Sum>(account).value
+    public fun get_addition(n1:u64,n2:u64): u64{
+        let sum = n1+n2;
+        sum
     }
 
     #[view]
-    public fun get_subtraction(account: address): u64 acquires Sub{
-        assert!(exists<Sub>(account),error::not_found(ENO_MESSAGE));
-        *&borrow_global<Sub>(account).value
+    public fun get_subtraction(n1:u64,n2:u64): u64{
+        assert!(n1>n2,EARITHMATIC_ERROR);
+        let sub = n1-n2;
+        sub
     }
     #[view]
-    public fun get_multiplication(account: address): u64 acquires Multi{
-        assert!(exists<Multi>(account),error::not_found(ENO_MESSAGE));
-        *&borrow_global<Multi>(account).value
+    public fun get_multiplication(n1:u64,n2:u64): u64 {
+        let multi = n1*n2;
+        multi
     }
     #[view]
-    public fun get_division(account: address): u64 acquires Div{
-        assert!(exists<Div>(account),error::not_found(ENO_MESSAGE));
-        *&borrow_global<Div>(account).value
-    }
-    
-    public entry fun set_addition(account: signer, num1 : u64, num2: u64){
-        let acc_addr = signer::address_of(&account);
-        let sum = num1 + num2;
-        if(!exists<Sum>(acc_addr)){
-            move_to<Sum>(&account,Sum{value:sum})
-        }
-    }
-
-    public entry fun set_subtraction(account: signer, num1 : u64, num2: u64){
-        let acc_addr = signer::address_of(&account);
-        let sub = num1 - num2;
-        if(!exists<Sub>(acc_addr)){
-            move_to<Sub>(&account,Sub{value:sub})
-        }
-    }
-
-    public entry fun set_multiplication(account: signer, num1 : u64, num2: u64){
-        let acc_addr = signer::address_of(&account);
-        let multi = num1 * num2;
-        if(!exists<Multi>(acc_addr)){
-            move_to<Multi>(&account,Multi{value:multi})
-        }
-    }
-
-    public entry fun set_division(account: signer, num1 : u64, num2: u64){
-        let acc_addr = signer::address_of(&account);
-        let div = num1 / num2;
-        if(!exists<Div>(acc_addr)){
-            move_to<Div>(&account,Div{value:div})
-        }
+    public fun get_division(n1:u64,n2:u64): u64{
+        assert!(n2!=0,EARITHMATIC_ERROR);
+        let div = n1/n2;
+        div
     }
 
     #[test(account = @0x1)]
-    public fun set_add(account: signer) acquires Sum{
-        let addr = signer::address_of(&account);
-        set_addition(account,3,2);
-        assert!(get_addition(addr)==5, ENO_MESSAGE);
+    public fun test_add(){
+        assert!(get_addition(3,2)==5, ENO_MESSAGE);
     }
-    #[test(account = @0x1)]
-    public fun set_sub(account: signer) acquires Sub{
-        let addr = signer::address_of(&account);
-        set_subtraction(account,3,2);
-        assert!(get_subtraction(addr)==1, ENO_MESSAGE);
+    #[test]
+    public fun test_sub(){
+        assert!(get_subtraction(4,3)==1, ENO_MESSAGE);
     }
-    #[test(account = @0x1)]
-    public fun set_multi(account: signer) acquires Multi{
-        let addr = signer::address_of(&account);
-        set_multiplication(account,3,2);
-        assert!(get_multiplication(addr)==6, ENO_MESSAGE);
+    #[test]
+    public fun test_multi(){
+        assert!(get_multiplication(3,2)==6, ENO_MESSAGE);
     }
-    #[test(account = @0x1)]
-    public fun set_div(account: signer) acquires Div{
-        let addr = signer::address_of(&account);
-        set_division(account,4,2);
-        assert!(get_division(addr)==2, ENO_MESSAGE);
+    #[test]
+    public fun test_div(){
+        assert!(get_division(4,2)==2, ENO_MESSAGE);
     }
 }
